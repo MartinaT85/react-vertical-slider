@@ -1,15 +1,70 @@
 import { useState, useEffect } from "react";
 import { FaLongArrowAltDown, FaLongArrowAltUp } from "react-icons/fa";
 import "./style/style.css";
+import data from "./data.js";
 
 function App() {
-  const [leftSide, setLeftSide] = useState([]);
-  const [rightSide, setRightSide] = useState([]);
+  const [slides] = useState(data);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const lastIndex = slides.length - 1;
+    if (index < 0) {
+      setIndex(lastIndex);
+    }
+    if (index > lastIndex) {
+      setIndex(0);
+    }
+  }, [index, slides]);
+
+  useEffect(() => {
+    let slider = setInterval(() => {
+      setIndex(index + 1);
+    }, 3000);
+    return () => clearInterval(slider);
+  }, [index]);
   return (
     <div className="App">
       <div className="slider-container">
-        <div className="left-side">
-          <div style={{ backgroundColor: "#fd3555" }}>
+        {slides.map((slide, slideIndex) => {
+          const { id, image, title, paragraph, color } = slide;
+          let position = "nextSlide";
+          if (slideIndex === index) {
+            position = "activeSlide";
+          }
+          if (
+            slideIndex === index - 1 ||
+            (index === 0 && slideIndex === slides.length - 1)
+          ) {
+            position = "lastSlide";
+          }
+          return (
+            <>
+              <article className={`left-side ${position}`} key={id}>
+                <div style={{ backgroundColor: color }}>
+                  <h1>{title}</h1>
+                  <p>{paragraph}</p>
+                </div>
+              </article>
+              <article className={`right-side ${position}`} key={color}>
+                <div style={{ backgroundImage: image }}></div>
+              </article>
+            </>
+          );
+        })}
+        <div className="buttons">
+          <button className="up" onClick={() => setIndex(index - 1)}>
+            <FaLongArrowAltUp />
+          </button>
+          <button className="down" onClick={() => setIndex(index + 1)}>
+            <FaLongArrowAltDown />
+          </button>
+        </div>
+      </div>
+
+      {/* <div className="slider-container">
+        <div className="left-side"> */}
+      {/* <div style={{ backgroundColor: "#fd3555" }}>
             <h1>Hello</h1>
             <p>Lorem ipsum dolor sit amet.</p>
           </div>
@@ -46,8 +101,8 @@ function App() {
             style={{
               backgroundImage: `url('https://images.unsplash.com/photo-1510942201312-84e7962f6dbb?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=da4ca7a78004349f1b63f257e50e4360&auto=format&fit=crop&w=1050&q=80')`,
             }}
-          ></div>
-        </div>
+          ></div> */}
+      {/* </div>
         <div className="buttons">
           <button className="up">
             <FaLongArrowAltUp />
@@ -56,7 +111,7 @@ function App() {
             <FaLongArrowAltDown />
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
